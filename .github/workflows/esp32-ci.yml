@@ -86,7 +86,7 @@ jobs:
         working-directory: ${{ inputs.sketch_path }}
         run: |
           set -o pipefail
-          FILES=$(find . -regex '.*\.\(cpp\|c\)' -not -path './build/*')
+          FILES=$(find . -regex '.*\.\(cpp\|c\|ino\)' -not -path './build/*')
           if [ "${{ inputs.enforce_tidy }}" = "true" ]; then
             echo "$FILES" | xargs clang-tidy -p ./build
           else
