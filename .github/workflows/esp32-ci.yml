@@ -82,6 +82,21 @@ jobs:
             --build-path ./build \
             .
 
+      - name: clean compile_commands.json for clang-tidy
+        working-directory: ${{ inputs.sketch_path }}
+        run: |
+          # Strip out ESP32-specific Xtensa flags that standard clang-tidy doesn't recognize
+          sed -i 's/-mlongcalls//g' ./build/compile_commands.json
+          sed -i 's/-fno-tree-switch-conversion//g' ./build/compile_commands.json
+          sed -i 's/-fstrict-volatile-bitfields//g' ./build/compile_commands.json
+          sed -i 's/-mdisable-hardware-atomics//g' ./build/compile_commands.json
+          sed -i 's/-mfix-esp32-psram-cache-issue//g' ./build/compile_commands.json
+          sed -i 's/-mfix-esp32-psram-cache-strategy=memw//g' ./build/compile_commands.json
+          
+          # Replace the xtensa compiler reference with standard host clang wrappers
+          sed -i 's/xtensa-esp32-elf-g++/clang++/g' ./build/compile_commands.json
+          sed -i 's/xtensa-esp32-elf-gcc/clang/g' ./build/compile_commands.json
+
       - name: run clang-tidy
         working-directory: ${{ inputs.sketch_path }}
         run: |
